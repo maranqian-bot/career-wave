@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.exception.SdkException;
@@ -26,7 +26,9 @@ import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
-@Profile("!local & !test")
+// S3Config 와 동일한 스위치. mock-upload=true 면 S3Config 가 통째로 건너뛰어져
+// S3Client 빈이 없으므로, 이 어댑터도 같이 빠지고 Stub 어댑터가 대신 로드된다.
+@ConditionalOnProperty(name = "aws.s3.mock-upload", havingValue = "false", matchIfMissing = true)
 @Component
 @RequiredArgsConstructor
 public class S3EmploymentCertificateFileAdapter implements EmploymentCertificateFilePort {

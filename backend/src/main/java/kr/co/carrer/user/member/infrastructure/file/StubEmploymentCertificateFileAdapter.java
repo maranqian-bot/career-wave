@@ -7,7 +7,7 @@ import kr.co.carrer.user.member.service.EmploymentCertificateFilePort;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Profile;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,14 +16,19 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * 재직증명서 fileId 검증 stub — local/test 전용.
+ * 재직증명서 fileId 검증 stub — S3 미사용(mock-upload) 환경 전용.
  * 실 환경에서는 S3EmploymentCertificateFileAdapter 사용.
  * S3 adapter와 동일한 검증 로직(확장자 + Tika MIME)을 적용해
- * local/test와 생산 환경의 동작 일관성을 보장한다.
+ * mock 환경과 생산 환경의 동작 일관성을 보장한다.
  * 중복 사용 방지는 company_profiles.cert_file_url UNIQUE 제약으로 DB 레벨에서 보장한다.
+ *
+ * 이전에는 @Profile({"local","test"}) 로 갈렸으나, 그 경우 profile 이 local/test 가
+ * 아니면서 aws.s3.mock-upload=true 인 조합(데모 배포)에서 S3Config 가 통째로
+ * 건너뛰어져 S3Client 빈이 없는데 S3 adapter 가 로드되며 기동에 실패했다.
+ * S3Config 와 동일한 스위치로 통일해 두 빈이 항상 짝을 이루게 한다.
  */
 @Slf4j
-@Profile({"local", "test"})
+@ConditionalOnProperty(name = "aws.s3.mock-upload", havingValue = "true")
 @Component
 public class StubEmploymentCertificateFileAdapter implements EmploymentCertificateFilePort {
 

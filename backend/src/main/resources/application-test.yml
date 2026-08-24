@@ -29,3 +29,10 @@ jwt:
     secret: test-admin-secret-key-must-be-at-least-32-bytes!
     access-expiration: 10800000
     refresh-expiration: 86400000
+
+# StubEmploymentCertificateFileAdapter 가 @Profile({"local","test"}) 대신
+# aws.s3.mock-upload 로 갈리도록 바뀌었으므로, test 프로파일에서도 명시한다.
+# (기존과 동일하게 Stub 어댑터가 로드된다)
+aws:
+  s3:
+    mock-upload: true
