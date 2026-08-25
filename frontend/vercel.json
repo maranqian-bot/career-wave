@@ -1,5 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "build": {
+    "env": {
+      "VITE_DEMO_STANDALONE": "true"
+    }
+  },
   "rewrites": [
     {
       "source": "/(.*)",
